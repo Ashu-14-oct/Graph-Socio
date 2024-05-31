@@ -96,11 +96,11 @@ export const resolvers = {
             return comment;
         }
     },
-    User: {
-        password() {
-            return null;
-        }
-    },
+    // User: {
+    //     password() {
+    //         return null;
+    //     }
+    // },
     Post : {
         createdBy: async (post : any, _ : any, context : any) => {
             const user = await context.models.User.findOne({_id: post.createdBy});
