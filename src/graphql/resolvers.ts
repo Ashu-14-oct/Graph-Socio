@@ -61,6 +61,9 @@ export const resolvers = {
         },
         createPost: async (_ : any, args: any, context: any) => {
             const { input } = args;
+            if(!context.user){
+                throw new Error("User not authenticated");
+            }
             const error = await postValidator(input);
             if(error) {
                 throw new Error(error.details[0].message);
@@ -77,6 +80,9 @@ export const resolvers = {
             return post;
         },
         createComment: async (_ : any, args: any, context: any) => {
+            if(!context.user){
+                throw new Error("User not authenticated");
+            }
             const { input } = args;
             const error = await commentValidator(input);
 

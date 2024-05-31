@@ -36,6 +36,6 @@ export const decryptToken = async (token: string) => {
         const user = await jwt.verify(token, process.env.PRIVATE_KEY || '');
         return user;
     } catch (error) {
-        return error;
+        return null;
     }
 }
