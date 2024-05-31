@@ -8,6 +8,9 @@ input UserSignInInput {
     email: String!
     password: String!
 }
+input CreatePostInput {
+    tweet: String!
+}
 
 # outputs
 type SignInOutput {
@@ -24,7 +27,11 @@ type User {
     email: String!
     password: String!
 }
-
+type Post {
+    id: ID!
+    tweet: String!
+    createdBy: User!
+}
 
 # query and mutation
 type Query {
@@ -33,5 +40,6 @@ type Query {
 
 type Mutation {
     createUser(input: CreateUserInput!): User!
-    signInUser(input: UserSignInInput): SignInOutput!
+    signInUser(input: UserSignInInput!): SignInOutput!
+    createPost(input: CreatePostInput!): Post!
 }

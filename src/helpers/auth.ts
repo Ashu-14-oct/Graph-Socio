@@ -30,3 +30,12 @@ export const getToken = async (userInput: any) => {
         return error
     }
 }
+
+export const decryptToken = async (token: string) => {
+    try {
+        const user = await jwt.verify(token, process.env.PRIVATE_KEY || '');
+        return user;
+    } catch (error) {
+        return error;
+    }
+}

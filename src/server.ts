@@ -8,6 +8,7 @@ import './config/mongoose.config';
 import { resolvers } from "./graphql/resolvers";
 import { readFileSync } from "fs";
 import { models } from "./models";
+import { decryptToken } from "./helpers/auth";
 
 const typeDefs = readFileSync('./src/graphql/schema.graphql', {encoding: 'utf-8'});
 
@@ -22,8 +23,12 @@ async function startServer(){
     await server.start();
     app.use('/', expressMiddleware(server, {
         context: async ({req}) => {
+            const token = req.headers.authorization as string;
+            const user = await decryptToken(token);
+            // console.log(user);          
             return {
                 models,
+                user
             }
         }
     }));

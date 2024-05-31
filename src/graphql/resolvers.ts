@@ -1,5 +1,6 @@
 import { comparePassword, getToken, hashPassword } from "../helpers/auth";
 import { SigninValidator, SignupValidator } from "../validation/authValidation";
+import { postValidator } from "../validation/postValidation";
 
 export const resolvers = {
     Query: {
@@ -57,6 +58,32 @@ export const resolvers = {
                 ...user._doc,
                 token
             }
+        },
+        createPost: async (_ : any, args: any, context: any) => {
+            const { input } = args;
+             const error = await postValidator(input);
+             if(error) {
+                throw new Error(error.details[0].message);
+            }
+
+            const newPost = await context.models.Post({
+                ...input,
+                createdBy: context.user.id
+            });
+
+            const post = await newPost.save();
+            return post;
+        }
+    },
+    User: {
+        password() {
+            return null;
+        }
+    },
+    Post : {
+        createdBy: async (post : any, _ : any, context : any) => {
+            const user = await context.models.User.findOne({_id: post.createdBy});
+            return user;
         }
     }
 } 
