@@ -21,7 +21,7 @@ async function startServer(){
     const server = new ApolloServer({typeDefs, resolvers});
     await server.start();
     app.use('/', expressMiddleware(server, {
-        context: async () => {
+        context: async ({req}) => {
             return {
                 models,
             }
