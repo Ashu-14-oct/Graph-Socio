@@ -16,20 +16,57 @@ This project is a GraphQL API built with Express, Apollo Server, and MongoDB. It
 ```plaintext
 .
 ├── config
-│   └── mongoose.config.js
+│   └── mongoose.config.ts
 ├── graphql
-│   ├── resolvers.js
+│   ├── resolvers.ts
 │   └── schema.graphql
 ├── helpers
-│   └── auth.js
+│   └── auth.ts
 ├── models
-│   ├── User.js
-│   ├── Post.js
-│   └── Comment.js
-├── validators
-│   └── postValidator.js
+│   ├── User.ts
+│   ├── Post.ts
+│   └── Comment.ts
+├── validation
+│   └── authValidation.ts
+│   └── postValidator.ts
 ├── .env
 ├── package.json
-├── server.js
+├── server.ts
 └── README.md
 ```
+
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+- Node.js
+- npm
+- MongoDB
+
+## Installation
+
+1. Clone the repository:
+
+    ```sh
+    git clone https://github.com/Ashu-14-oct/Graph-Socio.git
+    cd Graph-Socio
+    ```
+
+2. Install dependencies:
+
+    ```sh
+    npm install
+    ```
+3. Build the project:
+   ```sh
+    npm build
+    ```
+4. start the Application
+   ```sh
+   npm start 
+   ```
+5. For development, you can use:
+   ```sh
+   npm intsall ts-node-dev --save-dev
+   npm run dev 
+   ```
