@@ -11,6 +11,10 @@ input UserSignInInput {
 input CreatePostInput {
     tweet: String!
 }
+input CreateCommentInput {
+    postId: String!
+    comment: String!
+}
 
 # outputs
 type SignInOutput {
@@ -26,10 +30,17 @@ type User {
     name: String!
     email: String!
     password: String!
+    posts: [Post]
 }
 type Post {
     id: ID!
     tweet: String!
+    comments: [Comment!]!
+    createdBy: User!
+}
+type Comment {
+    id: ID!
+    comment: String!
     createdBy: User!
 }
 
@@ -42,4 +53,5 @@ type Mutation {
     createUser(input: CreateUserInput!): User!
     signInUser(input: UserSignInInput!): SignInOutput!
     createPost(input: CreatePostInput!): Post!
+    createComment(input: CreateCommentInput!): Comment!
 }

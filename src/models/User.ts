@@ -5,24 +5,29 @@ export interface IUser extends Document {
     email: string;
     password: string;
     posts?: Types.ObjectId[];
+    comments?: Types.ObjectId[];
 }
 
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        requried: true
+        requried: true,
     },
     email: {
         type: String,
-        required: true
+        required: true,
     },
     password: {
         type: String,
-        required: true
+        required: true,
     },
     posts: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Post'
+        ref: 'Post',
+    }],
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment',
     }]
 }, {
     timestamps: true
