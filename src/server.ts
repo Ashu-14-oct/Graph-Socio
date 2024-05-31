@@ -7,6 +7,7 @@ import {expressMiddleware} from '@apollo/server/express4';
 import './config/mongoose.config';
 import { resolvers } from "./graphql/resolvers";
 import { readFileSync } from "fs";
+import { models } from "./models";
 
 const typeDefs = readFileSync('./src/graphql/schema.graphql', {encoding: 'utf-8'});
 
@@ -22,7 +23,7 @@ async function startServer(){
     app.use('/', expressMiddleware(server, {
         context: async () => {
             return {
-
+                models,
             }
         }
     }));
