@@ -1,3 +1,4 @@
+import { hashPassword } from "../helpers/auth";
 import { SignupValidator } from "../validation/authValidation";
 
 export const resolvers = {
@@ -23,7 +24,12 @@ export const resolvers = {
                 throw new Error("User already exist with this email, try different email");
             }
 
-            const newUser = new context.models.User(input);
+            const hashedPassword = await hashPassword(input.password);
+
+            const newUser = new context.models.User({
+                ...input,
+                password: hashedPassword,
+            });
             await newUser.save();
 
             return newUser;
