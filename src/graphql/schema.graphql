@@ -1,10 +1,23 @@
-
+#inputs
 input CreateUserInput {
     name: String!
     email: String!
     password: String!
 }
+input UserSignInInput {
+    email: String!
+    password: String!
+}
 
+# outputs
+type SignInOutput {
+    name: String!
+    email: String!
+    password: String!
+    token: String!
+}
+
+# types
 type User {
     id: ID!
     name: String!
@@ -12,10 +25,13 @@ type User {
     password: String!
 }
 
+
+# query and mutation
 type Query {
     getUser: User!
 }
 
 type Mutation {
     createUser(input: CreateUserInput!): User!
+    signInUser(input: UserSignInInput): SignInOutput!
 }
