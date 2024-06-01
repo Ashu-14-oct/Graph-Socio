@@ -4,13 +4,25 @@ import { commentValidator, postValidator } from "../validation/postValidation";
 
 export const resolvers = {
     Query: {
-        getUser: async (_ : any, __ : any, context: any) => {
-            return  {
-                id: '123',
-                name: 'ashu',
-                email: 'ashu@mail',
-                password: '123',
-            };
+        getUserPosts: async (_ : any, args: any, context: any) => {
+            const { userId } = args;      
+            const user = await context.models.User.findById(userId); 
+            if(!user){
+                throw new Error("User does not exist");
+            }
+            if(user.posts.length === 0){
+                throw new Error("User haven't posted anything yet");
+            }
+            
+            const posts = await Promise.all(user.posts.map(async (postId: string) => {
+                const post = await context.models.Post.findById(postId);
+                if (!post) {
+                    throw new Error(`Post with ID ${postId} not found`);
+                }
+                return post;
+            }));
+
+            return posts;
         }
     },
     Mutation: {

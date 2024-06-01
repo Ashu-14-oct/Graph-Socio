@@ -54,7 +54,7 @@ type Comment {
 
 # query and mutation
 type Query {
-    getUser: User!
+    getUserPosts(userId: ID!): [Post!]
 }
 
 type Mutation {
