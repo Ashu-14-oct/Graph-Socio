@@ -4,7 +4,7 @@ import { commentValidator, postValidator } from "../validation/postValidation";
 
 export const resolvers = {
     Query: {
-        getUserPosts: async (_ : any, args: any, context: any) => {
+        getUserPosts: async (_ : any, args: any, context: any) => {        
             const { userId } = args;      
             const user = await context.models.User.findById(userId); 
             if(!user){
@@ -86,10 +86,35 @@ export const resolvers = {
                 createdBy: context.user.id
             });
 
+
             const post = await newPost.save();
             await context.models.User.findByIdAndUpdate(context.user.id, {$push: {posts: post._id}});
 
             return post;
+        },
+        deletePost: async (_: any, args: any, context: any) => {
+            if(!context.user){
+                throw new Error("User not authenticated");
+            }
+            console.log(context.user.id);
+            
+            const { postId } = args;
+            console.log(postId);
+            
+            const post = await context.models.Post.findOne({_id: postId});
+            console.log(post);
+            
+            if (!post) {
+                throw new Error("Post not found");
+            }
+
+            if(post.createdBy.toString() !== context.user.id){
+                throw new Error("Not authorized to delete this post")
+            }
+            console.log(context.user.id);
+            await context.models.User.findByIdAndUpdate(context.user.id, {$pull: {posts: postId}});
+            
+            return { success: true, message: "Post deleted successfully" };
         },
         createComment: async (_ : any, args: any, context: any) => {
             if(!context.user){

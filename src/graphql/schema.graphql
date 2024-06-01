@@ -29,6 +29,10 @@ type SignInOutput {
     password: String!
     token: String!
 }
+type DeletePostResponse {
+    success: Boolean!
+    message: String!
+}
 
 # types
 type User {
@@ -61,6 +65,7 @@ type Mutation {
     createUser(input: CreateUserInput!): User!
     signInUser(input: UserSignInInput!): SignInOutput!
     createPost(input: CreatePostInput!): Post!
+    deletePost(postId: String!): DeletePostResponse!
     createComment(input: CreateCommentInput!): Comment!
     followUser(input: FollowUserInput!): User!
     unfollowUser(input: UnfollowUserInput!): User!
