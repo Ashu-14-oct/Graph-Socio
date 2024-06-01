@@ -51,7 +51,7 @@ type User {
 type Post {
     id: ID!
     tweet: String!
-    comments: [Comment!]!
+    comments: [Comment!]
     createdBy: User!
 }
 type Comment {
@@ -63,6 +63,7 @@ type Comment {
 # query and mutation
 type Query {
     getUserPosts(userId: ID!): [Post!]
+    getUserComments(userId: ID!): [Comment!]
 }
 
 type Mutation {

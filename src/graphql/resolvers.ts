@@ -23,6 +23,25 @@ export const resolvers = {
             }));
 
             return posts;
+        },
+        getUserComments: async (_: any, args: any, context: any) => {
+            const { userId } = args;
+            const user = await context.models.User.findById(userId);
+            if(!user){
+                throw new Error("User does not exist");
+            }
+            if(user.comments.length === 0){
+                throw new Error("User haven't commented on any post");
+            }
+            const comments = await Promise.all(user.comments.map(async (commentId: string) => {
+                const comment = await context.models.Comment.findById(commentId);
+                if(!comment){
+                    throw new Error(`Comment with ID ${commentId} does not exists`);
+                }
+                return comment;
+            }));
+
+            return comments;
         }
     },
     Mutation: {
