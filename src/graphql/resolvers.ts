@@ -107,7 +107,6 @@ export const resolvers = {
             }
             const userId = args.input.userId;
             const userToFollow = await context.models.User.findOne({_id: userId});
-            console.log(userId, userToFollow);
             
             if(!userToFollow){
                 throw new Error("Cannot follow, User does not exist");
@@ -118,6 +117,27 @@ export const resolvers = {
 
             await context.models.User.findByIdAndUpdate(context.user.id, {$push: {followings: userToFollow._id}});
             await context.models.User.findByIdAndUpdate(userId, {$push: {followers: context.user.id}});
+
+            const user = await context.models.User.findOne({_id: context.user.id});
+
+            return user;
+        },
+        unfollowUser: async (_: any, args: any, context: any) => {
+            if(!context.user){
+                throw new Error("User not authenticated");
+            }
+
+            const userId = args.input.userId;
+            const userToUnfollow = await context.models.User.findOne({_id: userId});
+            if(!userToUnfollow){
+                throw new Error("Cannot Unfollow, User does not exist");
+            }
+            if(!userToUnfollow.followers.includes(context.user.id)){
+                throw new Error("Not following this user");
+            }
+
+            await context.models.User.findByIdAndUpdate(context.user.id, {$pull: {followings: userToUnfollow._id}});
+            await context.models.User.findByIdAndUpdate(userId, {$pull: {followers: context.user.id}});
 
             const user = await context.models.User.findOne({_id: context.user.id});
 
