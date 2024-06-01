@@ -6,9 +6,9 @@ This project is a GraphQL API built with Express, Apollo Server, and MongoDB. It
 
 - User registration and login with password hashing
 - JWT-based authentication
+- Follow and unfollow other users
 - Create and fetch posts
 - Create and fetch comments on posts
-- Add friends
 - Input validation using Joi
 
 ## Project Structure
