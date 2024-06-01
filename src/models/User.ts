@@ -6,6 +6,8 @@ export interface IUser extends Document {
     password: string;
     posts?: Types.ObjectId[];
     comments?: Types.ObjectId[];
+    followers?: Types.ObjectId[];
+    followings?: Types.ObjectId[];
 }
 
 const userSchema = new mongoose.Schema({
@@ -28,7 +30,15 @@ const userSchema = new mongoose.Schema({
     comments: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment',
-    }]
+    }],
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }],
+    followings: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }],
 }, {
     timestamps: true
 });
