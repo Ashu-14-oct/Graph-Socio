@@ -93,28 +93,28 @@ export const resolvers = {
             return post;
         },
         deletePost: async (_: any, args: any, context: any) => {
-            if(!context.user){
+            if (!context.user) {
                 throw new Error("User not authenticated");
-            }
-            console.log(context.user.id);
-            
-            const { postId } = args;
-            console.log(postId);
-            
-            const post = await context.models.Post.findOne({_id: postId});
-            console.log(post);
-            
+            }                    
+            const { postId } = args;    
+            const post = await context.models.Post.findOne({_id: postId});            
+        
             if (!post) {
                 throw new Error("Post not found");
             }
-
-            if(post.createdBy.toString() !== context.user.id){
+            if (post.createdBy.toString() !== context.user.id){
                 throw new Error("Not authorized to delete this post")
             }
-            console.log(context.user.id);
-            await context.models.User.findByIdAndUpdate(context.user.id, {$pull: {posts: postId}});
-            
-            return { success: true, message: "Post deleted successfully" };
+        
+            try {
+                await post.remove();
+                await context.models.User.findByIdAndUpdate(context.user.id, {$pull: {posts: postId}});
+        
+                return { success: true, message: "Post deleted successfully" };
+            } catch (error) {
+                console.error("Error deleting post:", error);
+                throw new Error("Failed to delete post");
+            }
         },
         createComment: async (_ : any, args: any, context: any) => {
             if(!context.user){
@@ -137,6 +137,34 @@ export const resolvers = {
             await context.models.User.findByIdAndUpdate(context.user.id, {$push: {comments: comment._id}});
 
             return comment;
+        },
+        deleteComment: async (_: any, args: any, context: any) => {
+            if (!context.user) {
+                throw new Error("User not authenticated");
+            }
+        
+            const { commentId } = args;
+            
+            try {
+                const comment = await context.models.Comment.findById(commentId);
+        
+                if (!comment) {
+                    throw new Error("Comment does not exist");
+                }
+        
+                if (comment.createdBy.toString() !== context.user.id) {
+                    throw new Error("Not authorized to delete this comment");
+                }
+        
+                await context.models.Comment.findByIdAndDelete(commentId);
+        
+                await context.models.User.findByIdAndUpdate(context.user.id, { $pull: { comments: commentId } });
+
+                return { success: true, message: "Comment deleted successfully" };
+            } catch (error) {
+                console.error("Error deleting comment:", error);
+                throw new Error("Failed to delete comment");
+            }
         },
         followUser: async (_:any, args: any, context: any) => {
             if(!context.user){
