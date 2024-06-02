@@ -8,6 +8,15 @@ export const postValidator = async (postInput: any) => {
     return error;
 }
 
+export const updatePostValidator = async (updatePostInput: any) => {
+    const updatePostSchema = Joi.object({
+        tweet: Joi.string().required().min(3),
+        postId: Joi.string().required()
+    });
+    const { error } = updatePostSchema.validate(updatePostInput);
+    return error;
+}
+
 export const commentValidator = async (commentInput: string) => {
     const commentSchema = Joi.object({
         comment: Joi.string().required().min(3),

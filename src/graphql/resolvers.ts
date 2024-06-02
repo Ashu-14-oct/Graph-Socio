@@ -1,6 +1,6 @@
 import { comparePassword, getToken, hashPassword } from "../helpers/auth";
 import { SigninValidator, SignupValidator } from "../validation/authValidation";
-import { commentValidator, postValidator } from "../validation/postValidation";
+import { commentValidator, postValidator, updatePostValidator } from "../validation/postValidation";
 
 export const resolvers = {
     Query: {
@@ -110,6 +110,29 @@ export const resolvers = {
             await context.models.User.findByIdAndUpdate(context.user.id, {$push: {posts: post._id}});
 
             return post;
+        },
+        updatePost: async (_: any, args: any, context: any) => {
+            if(!context.user){
+                throw new Error("User not authenticated");
+            }
+            const { input } = args;
+            const error = await updatePostValidator(input);
+            if(error){
+                throw new Error(error.details[0].message);
+            }
+            const post = await context.models.Post.findById(input.postId);
+            console.log(post.createdBy);
+            
+            
+            if(!post){
+                throw new Error("Post does not exist");
+            }
+            if(context.user.id !== post.createdBy.toString()){
+                throw new Error("Not authorized to update this comment");
+            }
+            const updatedPost =  await context.models.Post.findByIdAndUpdate(input.postId, {tweet: input.tweet}, {new: true});
+
+            return updatedPost;
         },
         deletePost: async (_: any, args: any, context: any) => {
             if (!context.user) {

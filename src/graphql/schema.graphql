@@ -11,6 +11,10 @@ input UserSignInInput {
 input CreatePostInput {
     tweet: String!
 }
+input UpdatePostInput {
+    postId: String!
+    tweet: String!
+}
 input CreateCommentInput {
     postId: String!
     comment: String!
@@ -70,6 +74,7 @@ type Mutation {
     createUser(input: CreateUserInput!): User!
     signInUser(input: UserSignInInput!): SignInOutput!
     createPost(input: CreatePostInput!): Post!
+    updatePost(input: UpdatePostInput!): Post!
     deletePost(postId: String!): DeletePostResponse!
     createComment(input: CreateCommentInput!): Comment!
     deleteComment(commentId: String!): DeleteCommentResponse!
