@@ -128,7 +128,7 @@ export const resolvers = {
                 throw new Error("Post does not exist");
             }
             if(context.user.id !== post.createdBy.toString()){
-                throw new Error("Not authorized to update this comment");
+                throw new Error("Not authorized to update this post");
             }
             const updatedPost =  await context.models.Post.findByIdAndUpdate(input.postId, {tweet: input.tweet}, {new: true});
 
