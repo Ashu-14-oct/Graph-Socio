@@ -1,6 +1,6 @@
 import { comparePassword, getToken, hashPassword } from "../helpers/auth";
 import { SigninValidator, SignupValidator } from "../validation/authValidation";
-import { commentValidator, postValidator, updatePostValidator } from "../validation/postValidation";
+import { commentValidator, postValidator, updateCommentValidator, updatePostValidator } from "../validation/postValidation";
 
 export const resolvers = {
     Query: {
@@ -179,6 +179,27 @@ export const resolvers = {
             await context.models.User.findByIdAndUpdate(context.user.id, {$push: {comments: comment._id}});
 
             return comment;
+        },
+        updateComment: async (_:any, args: any, context: any) => {
+            if (!context.user) {
+                throw new Error("User not authenticated");
+            }
+            const { input } = args;
+            const error = await updateCommentValidator(input);
+            if(error){
+                throw new Error(error.details[0].message);
+            }
+
+            const comment = await context.models.Comment.findById(input.commentId);
+            if(!comment){
+                throw new Error("Comment not found");
+            }
+            if(context.user.id !== comment.createdBy.toString()){
+                throw new Error("Not authorized to update this comment");
+            }
+            const updatedComment = await context.models.Comment.findByIdAndUpdate(input.commentId, {comment: input.comment}, {new: true});
+            return updatedComment;
+
         },
         deleteComment: async (_: any, args: any, context: any) => {
             if (!context.user) {

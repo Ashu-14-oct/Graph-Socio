@@ -25,3 +25,12 @@ export const commentValidator = async (commentInput: string) => {
     const { error } = commentSchema.validate(commentInput);
     return error;
 } 
+
+export const updateCommentValidator = async (updateCommentInput: string) => {
+    const updateCommentSchema = Joi.object({
+        comment: Joi.string().required().min(3),
+        commentId: Joi.string().required()
+    });
+    const { error } = updateCommentSchema.validate(updateCommentInput);
+    return error;
+} 
