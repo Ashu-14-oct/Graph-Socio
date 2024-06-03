@@ -1,5 +1,4 @@
 import { ApolloServer } from "@apollo/server";
-import { createTestClient } from "apollo-server-testing";
 import { expressMiddleware } from '@apollo/server/express4';
 import { stopServer, typeDefs } from "../server";
 import { resolvers } from "../graphql/resolvers";
