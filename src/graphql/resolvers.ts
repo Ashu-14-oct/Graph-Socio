@@ -86,7 +86,9 @@ export const resolvers = {
             const token = getToken(user);
 
             return {
-                ...user._doc,
+                name: user.name,
+                email: user.email,
+                password: user.password,
                 token
             }
         },

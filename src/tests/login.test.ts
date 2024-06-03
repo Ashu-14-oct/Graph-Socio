@@ -46,7 +46,7 @@ describe('Login resolvers', () => {
 
     it('should login a user with correct credentials', async () => {
         const userInput = {
-            email: 'test@exmaple.com',
+            email: 'test@example.com',
             password: 'testpassword',
         };
 
@@ -67,7 +67,6 @@ describe('Login resolvers', () => {
             mutation LoginUser ($input: UserSignInInput!) {
                 signInUser(input : $input) {
                     token
-                    id
                     name
                     email
                 }
@@ -78,6 +77,11 @@ describe('Login resolvers', () => {
             query: LOGIN_USER,
             variables: {input: userInput}
         });
-    
+
+        const { data, errors } = response.body;
+        expect(errors).toBeUndefined();
+        expect(data.signInUser).toBeTruthy();
+        expect(data.signInUser.token).toBe('mockToken');
+        expect(data.signInUser.email).toBe(userInput.email);
     });
 });
