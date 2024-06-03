@@ -10,3 +10,7 @@ const db = mongoose
   });
 
   export default db;
+
+  export const closeDatabase = async () => {
+    await mongoose.connection.close();
+  };

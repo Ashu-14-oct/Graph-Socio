@@ -9,12 +9,15 @@ import { resolvers } from "./graphql/resolvers";
 import { readFileSync } from "fs";
 import { models } from "./models";
 import { decryptToken } from "./helpers/auth";
+import { closeDatabase } from "./config/mongoose.config";
 
-const typeDefs = readFileSync('./src/graphql/schema.graphql', {encoding: 'utf-8'});
+export const typeDefs = readFileSync('./src/graphql/schema.graphql', {encoding: 'utf-8'});
 
 const PORT = process.env.PORT || 4001;
 
-async function startServer(){
+let serverInstance: any;
+
+export async function startServer(){
     const app = express();
     app.use(express.json());
     app.use(cors());
@@ -36,8 +39,16 @@ async function startServer(){
         }
     }));
 
-    app.listen(PORT, () => {
+    serverInstance = app.listen(PORT, () => {
         console.log(`server running on PORT ${PORT}`);
     });
 }
+
+export async function stopServer() {
+    if (serverInstance) {
+      await closeDatabase();
+      serverInstance.close();
+    }
+  }
+
 startServer();
