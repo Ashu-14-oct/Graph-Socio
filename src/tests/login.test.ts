@@ -3,7 +3,7 @@ import { expressMiddleware } from '@apollo/server/express4';
 import { stopServer, typeDefs } from "../server";
 import { resolvers } from "../graphql/resolvers";
 import { models } from "../models";
-import express from "express";
+import express, { query } from "express";
 import { decryptToken, comparePassword, getToken } from "../helpers/auth";
 import { SigninValidator } from "../validation/authValidation";
 import request from 'supertest';
@@ -46,7 +46,7 @@ describe('Login resolvers', () => {
 
     it('should login a user with correct credentials', async () => {
         const userInput = {
-            email: 'test@example.com',
+            email: 'test@example.comn',
             password: 'testpassword',
         };
 
@@ -83,5 +83,36 @@ describe('Login resolvers', () => {
         expect(data.signInUser).toBeTruthy();
         expect(data.signInUser.token).toBe('mockToken');
         expect(data.signInUser.email).toBe(userInput.email);
+    });
+
+    it('should return an error if credentials are incorrect', async () => {
+        const userInput = {
+            email: 'test@example.com',
+            password: 'wrongpassword',
+        }
+
+        models.User.findOne = jest.fn().mockResolvedValue(null);
+
+        (SigninValidator as jest.Mock).mockResolvedValue(null);
+        (comparePassword as jest.Mock).mockResolvedValue(false);
+
+        const SIGNIN_USER = `
+            mutation SignInUser ($input : UserSignInInput\!){
+                signInUser(input : $input){
+                    token
+                    email
+                    name
+                }
+            }
+        `;
+
+        const response = await request(app).post('/').send({
+            query: SIGNIN_USER,
+            variables: {input: userInput}
+        });
+
+        const { errors } = response.body;
+        expect(errors).toBeTruthy();
+        expect(errors[0].message).toBe('User with this email does not exist');
     });
 });
