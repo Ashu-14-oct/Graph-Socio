@@ -4,8 +4,7 @@ import { expressMiddleware } from '@apollo/server/express4';
 import { stopServer, typeDefs } from "../server";
 import { resolvers } from "../graphql/resolvers";
 import { models } from "../models";
-import { startServer } from "../server";
-import express from "express";
+import express, { query } from "express";
 import { decryptToken, hashPassword } from "../helpers/auth";
 import { SignupValidator } from "../validation/authValidation";
 import request from 'supertest';
@@ -87,5 +86,39 @@ describe('User Resolvers', () => {
         expect(data.createUser).toBeTruthy();
         expect(data.createUser.name).toBe(userInput.name);
         expect(data.createUser.email).toBe(userInput.email);
+    });
+    it("should return an error if the email is already in use", async () => {
+        const userInput = { 
+            name: 'Test User',
+            email: 'test@example.com',
+            password: 'testpassword1',
+        }
+
+        models.User.findOne = jest.fn().mockResolvedValue({
+            id: '1',
+            name: userInput.name,
+            email: userInput.email,
+            password: userInput.password,
+        });
+
+        const CREATE_USER = `
+            mutation CreateUser($input: CreateUserInput!) {
+                createUser(input: $input){
+                    id
+                    name
+                    email
+                }
+            }
+        `;
+
+        const response = await request(app).post('/').send({
+            query: CREATE_USER,
+            variables: { input: userInput}
+        });
+
+        const { errors } = response.body;
+
+        expect(errors).toBeTruthy();
+        expect(errors[0].message).toBe('User already exist with this email, try different email');
     });
 });
