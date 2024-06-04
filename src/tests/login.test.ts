@@ -3,7 +3,7 @@ import { expressMiddleware } from '@apollo/server/express4';
 import { stopServer, typeDefs } from "../server";
 import { resolvers } from "../graphql/resolvers";
 import { models } from "../models";
-import express, { query } from "express";
+import express from "express";
 import { decryptToken, comparePassword, getToken } from "../helpers/auth";
 import { SigninValidator } from "../validation/authValidation";
 import request from 'supertest';
@@ -46,7 +46,7 @@ describe('Login resolvers', () => {
 
     it('should login a user with correct credentials', async () => {
         const userInput = {
-            email: 'test@example.comn',
+            email: 'test@example.com',
             password: 'testpassword',
         };
 
@@ -97,7 +97,7 @@ describe('Login resolvers', () => {
         (comparePassword as jest.Mock).mockResolvedValue(false);
 
         const SIGNIN_USER = `
-            mutation SignInUser ($input : UserSignInInput\!){
+            mutation SignInUser ($input : UserSignInInput!){
                 signInUser(input : $input){
                     token
                     email

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --forceExit --detectOpenHandles --maxWorkers=1",
     "dev": "ts-node-dev ./src/server.ts",
     "build": "tsc --build",
     "start": "node server.js"

@@ -123,13 +123,15 @@ export const resolvers = {
                 throw new Error(error.details[0].message);
             }
             const post = await context.models.Post.findById(input.postId);
-            console.log(post.createdBy);
-            
             
             if(!post){
                 throw new Error("Post does not exist");
             }
-            if(context.user.id !== post.createdBy.toString()){
+            console.log("User id", context.user.id);
+            console.log("Post id", post.createdBy.toString());
+            
+            
+            if(context.user.id.toString() !== post.createdBy.toString()){
                 throw new Error("Not authorized to update this post");
             }
             const updatedPost =  await context.models.Post.findByIdAndUpdate(input.postId, {tweet: input.tweet}, {new: true});
@@ -146,7 +148,7 @@ export const resolvers = {
             if (!post) {
                 throw new Error("Post not found");
             }
-            if (post.createdBy.toString() !== context.user.id){
+            if (post.createdBy.toString() !== context.user.id.toString()){
                 throw new Error("Not authorized to delete this post")
             }
         

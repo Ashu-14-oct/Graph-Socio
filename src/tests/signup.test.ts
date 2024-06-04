@@ -27,7 +27,7 @@ describe('User Resolvers', () => {
             resolvers,
         });
         await server.start();
-        app= express();
+        app = express();
 
         app.use(express.json());
         app.use(expressMiddleware(server, {
