@@ -245,4 +245,122 @@ describe('Comment resolvers', () => {
             expect(errors[0].message).toBe("Not authorized to update this comment");
         });
     });
+
+    describe('delete comment', () => {
+        it('should delete a comment when user is authenticated and is the owner', async () => {
+            const commentId = '1';
+            const postId = '2';
+
+            const user = {
+                id: new ObjectId(),
+                name: 'Test User',
+                email: 'test@example.com',
+            };
+
+            const comment = {
+                id: commentId,
+                comment: 'This is a test post',
+                createdBy: user.id,
+                remove: jest.fn().mockResolvedValue(true),
+            };
+
+            (decryptToken as jest.Mock).mockResolvedValue(user);
+            (updateCommentValidator as jest.Mock).mockResolvedValue(null);
+
+            models.Comment.findById = jest.fn().mockResolvedValue(comment);
+            models.Comment.findByIdAndDelete = jest.fn().mockResolvedValue(comment);
+            models.User.findByIdAndUpdate = jest.fn().mockResolvedValue({});
+            models.Post.findByIdAndUpdate = jest.fn().mockResolvedValue({});
+
+            const DELETE_COMMENT = `
+                mutation UpdateComment($postId: String!, $commentId: String!) {
+                    deleteComment(postId : $postId, commentId: $commentId) {
+                        success
+                        message
+                    }
+                }
+            `;
+
+            const response = await request(app).post('/').send({
+                query: DELETE_COMMENT,
+                variables: { commentId, postId}
+            });
+
+            const { data, errors } = response.body;
+            expect(errors).toBeUndefined();
+            expect(data.deleteComment).toBeTruthy();
+            expect(data.deleteComment.message).toBe("Comment deleted successfully");
+        });
+
+        it('should failed to delete a comment when user is not authenticated', async () => {
+            const commentId = '1';
+            const postId = '2';
+
+            (decryptToken as jest.Mock).mockResolvedValue(null);
+
+            const DELETE_COMMENT = `
+                mutation UpdateComment($postId: String!, $commentId: String!) {
+                    deleteComment(postId : $postId, commentId: $commentId) {
+                        success
+                        message
+                    }
+                }
+            `;
+
+            const response = await request(app).post('/').send({
+                query: DELETE_COMMENT,
+                variables: { commentId, postId}
+            });
+
+            const { errors } = response.body;
+            expect(errors).toBeTruthy();
+            expect(errors[0].message).toBe("User not authenticated");
+        });
+
+        it('should failed to delete a comment when user is not the owner', async () => {
+            const commentId = '1';
+            const postId = '2';
+
+            const user = {
+                id: new ObjectId(),
+                name: 'Test User',
+                email: 'test@example.com',
+            };
+
+            const anotherUser = {
+                id: new ObjectId(),
+                name: 'Test User',
+                email: 'test@example.com',
+            }
+
+            const comment = {
+                id: commentId,
+                comment: 'This is a test post',
+                createdBy: anotherUser.id,
+            };
+
+            (decryptToken as jest.Mock).mockResolvedValue(user);
+
+            models.Comment.findById = jest.fn().mockResolvedValue(comment);
+
+            const DELETE_COMMENT = `
+                mutation UpdateComment($postId: String!, $commentId: String!) {
+                    deleteComment(postId : $postId, commentId: $commentId) {
+                        success
+                        message
+                    }
+                }
+            `;
+
+            const response = await request(app).post('/').send({
+                query: DELETE_COMMENT,
+                variables: { commentId, postId}
+            });
+
+            const { errors } = response.body;
+            expect(errors).toBeTruthy();
+            expect(errors[0].message).toBe("Not authorized to delete this comment");
+        });
+    });
+
 });
