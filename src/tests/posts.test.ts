@@ -58,7 +58,7 @@ describe('Post Resolvers', () => {
                 email: 'test@example.com',
             };
 
-            (decryptToken as jest.Mock).mockResolvedValue(user.id);
+            (decryptToken as jest.Mock).mockResolvedValue(user);
             (postValidator as jest.Mock).mockResolvedValue(null);
 
             const mockSave = jest.fn().mockResolvedValue({
