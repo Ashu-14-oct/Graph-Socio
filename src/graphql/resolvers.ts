@@ -198,7 +198,7 @@ export const resolvers = {
             if(!comment){
                 throw new Error("Comment not found");
             }
-            if(context.user.id !== comment.createdBy.toString()){
+            if(context.user.id.toString() !== comment.createdBy.toString()){
                 throw new Error("Not authorized to update this comment");
             }
             const updatedComment = await context.models.Comment.findByIdAndUpdate(input.commentId, {comment: input.comment}, {new: true});
@@ -219,7 +219,7 @@ export const resolvers = {
                     throw new Error("Comment does not exist");
                 }
         
-                if (comment.createdBy.toString() !== context.user.id) {
+                if (comment.createdBy.toString() !== context.user.id.toString()) {
                     throw new Error("Not authorized to delete this comment");
                 }
         

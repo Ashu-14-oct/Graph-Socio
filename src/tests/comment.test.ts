@@ -6,7 +6,7 @@ import { stopServer, typeDefs } from "../server";
 import { resolvers } from "../graphql/resolvers";
 import { models } from "../models";
 import { decryptToken } from "../helpers/auth";
-import { commentValidator } from "../validation/postValidation";
+import { commentValidator, updateCommentValidator } from "../validation/postValidation";
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
@@ -16,6 +16,7 @@ jest.mock('../helpers/auth', () => ({
 
 jest.mock('../validation/postValidation', () => ({
     commentValidator: jest.fn(),
+    updateCommentValidator: jest.fn(),
 }));
 
 describe('Comment resolvers', () => {
@@ -114,6 +115,134 @@ describe('Comment resolvers', () => {
             const { errors } = response.body;
             expect(errors).toBeTruthy();
             expect(errors[0].message).toBe("User not authenticated");
+        });
+    });
+
+    describe('update comment', () => {
+        it('should update a comment when user is authenticated and is the owner', async () => {
+            const commentInput = {
+                commentId: '2',
+                comment: 'This is an updated comment',
+            };
+
+            const user = {
+                id: new ObjectId(),
+                name: 'Test User',
+                email: 'test@example.com',
+            };
+
+            const comment = {
+                id: commentInput.commentId,
+                comment: 'This is a test post',
+                createdBy: user.id,
+            };
+
+            (decryptToken as jest.Mock).mockResolvedValue(user);
+            (updateCommentValidator as jest.Mock).mockResolvedValue(null);
+
+            models.Comment.findById = jest.fn().mockResolvedValue(comment);
+            models.Comment.findByIdAndUpdate = jest.fn().mockResolvedValue({
+                ...comment,
+                comment: commentInput.comment,
+            });
+
+            const UPDATE_COMMENT = `
+                mutation UpdateComment($input: UpdateCommentInput!) {
+                    updateComment(input: $input) {
+                        id
+                        comment
+                    }
+                }
+            `;
+
+            const response = await request(app).post('/').send({
+                query: UPDATE_COMMENT,
+                variables: { input: commentInput }
+            });
+
+            const { data, errors } = response.body;
+            expect(errors).toBeUndefined();
+            expect(data.updateComment).toBeTruthy();
+            expect(data.updateComment.comment).toBe(commentInput.comment);
+        });
+
+        it('should fail to update a comment when user is not authenticated', async () => {
+            const commentInput = {
+                commentId: '2',
+                comment: 'This is an updated post',
+            };
+
+            (decryptToken as jest.Mock).mockResolvedValue(null);
+
+            const UPDATE_COMMENT = `
+                mutation UpdateComment($input: UpdateCommentInput!) {
+                    updateComment(input: $input) {
+                        id
+                        comment
+                    }
+                }
+            `;
+
+            const response = await request(app).post('/').send({
+                query: UPDATE_COMMENT,
+                variables: { input: commentInput }
+            });
+
+            const { errors } = response.body;
+            expect(errors).toBeTruthy();
+            expect(errors[0].message).toBe("User not authenticated");
+        });
+
+        it('should fail to update a post when user is not the owner', async () => {
+            const commentInput = {
+                commentId: '2',
+                comment: 'This is an updated post',
+            };
+
+            const user = {
+                id: new ObjectId(),
+                name: 'Test User',
+                email: 'test@example.com',
+            };
+
+            const anotherUser = {
+                id: new ObjectId(),
+                name: 'Another User',
+                email: 'another@example.com',
+            };
+
+            const comment = {
+                id: commentInput.commentId,
+                comment: 'This is a test post',
+                createdBy: anotherUser.id,
+            };
+
+            (decryptToken as jest.Mock).mockResolvedValue(user);
+            (updateCommentValidator as jest.Mock).mockResolvedValue(null);
+
+            models.Post.findById = jest.fn().mockResolvedValue(comment);
+            models.Comment.findByIdAndUpdate = jest.fn().mockResolvedValue({
+                ...comment,
+                comment: commentInput.comment,
+            });
+
+            const UPDATE_COMMENT = `
+                mutation UpdateComment($input: UpdateCommentInput!) {
+                    updateComment(input: $input) {
+                        id
+                        comment
+                    }
+                }
+            `;
+
+            const response = await request(app).post('/').send({
+                query: UPDATE_COMMENT,
+                variables: { input: commentInput }
+            });
+
+            const { errors } = response.body;
+            expect(errors).toBeTruthy();
+            expect(errors[0].message).toBe("Not authorized to update this comment");
         });
     });
 });
