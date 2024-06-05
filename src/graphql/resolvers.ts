@@ -211,6 +211,7 @@ export const resolvers = {
             }
         
             const { commentId } = args;
+            const { postId } = args;
             
             try {
                 const comment = await context.models.Comment.findById(commentId);
@@ -225,7 +226,8 @@ export const resolvers = {
         
                 await context.models.Comment.findByIdAndDelete(commentId);
         
-                await context.models.User.findByIdAndUpdate(context.user.id, { $pull: { comments: commentId } });
+                await context.models.User.findByIdAndUpdate(context.user.id, { $pull: { comments: commentId }});
+                await context.models.Post.findByIdAndUpdate(postId, { $pull: { comments: commentId }});
 
                 return { success: true, message: "Comment deleted successfully" };
             } catch (error) {
