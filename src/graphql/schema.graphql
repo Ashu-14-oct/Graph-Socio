@@ -82,7 +82,7 @@ type Mutation {
     deletePost(postId: String!): DeletePostResponse!
     createComment(input: CreateCommentInput!): Comment!
     updateComment(input: UpdateCommentInput!): Comment!
-    deleteComment(commentId: String!): DeleteCommentResponse!
+    deleteComment(commentId: String!, postId: String!): DeleteCommentResponse!
     followUser(input: FollowUserInput!): User!
     unfollowUser(input: UnfollowUserInput!): User!
 }
