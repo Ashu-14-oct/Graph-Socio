@@ -35,7 +35,7 @@ describe('Comment resolvers', () => {
             context: async ({ req }) => {
                 const token = req.headers.authorization as string;
                 const user = await decryptToken(token);
-                return { token, user: user || null, models };
+                return { user: user || null, models };
             }
         }));
     });
