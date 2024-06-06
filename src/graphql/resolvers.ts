@@ -295,7 +295,7 @@ export const resolvers = {
       if (!userToUnfollow) {
         throw new Error("Cannot Unfollow, User does not exist");
       }
-      if (!userToUnfollow.followers.includes(context.user.id)) {
+      if (!userToUnfollow.followers.includes(context.user.id.toString())) {
         throw new Error("Not following this user");
       }
 
