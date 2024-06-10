@@ -2,6 +2,10 @@
 
 This project is a GraphQL API built with Express, Apollo Server, and MongoDB. It supports user authentication, creating posts, commenting on posts, and adding friends.
 
+## Project Demo
+
+[![Watch the video](https://img.youtube.com/vi/FhxPhUFaU3U/0.jpg)](https://www.youtube.com/watch?v=FhxPhUFaU3U)
+
 ## Features
 
 - User registration and login with password hashing

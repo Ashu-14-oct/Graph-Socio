@@ -28,7 +28,8 @@ export async function startServer(){
         context: async ({req}) => {
             const token = req.headers.authorization as string;
             const user = await decryptToken(token);
-
+            // console.log(token);
+            
             if(!user){
                 return { models, user: null };
             }          
